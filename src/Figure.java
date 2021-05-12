@@ -146,7 +146,7 @@ public class Figure {
 		}
 	}
 	
-	//ROTAR FIGURA A LA IZQUIERDA
+	//ROTAR FIGURA A LA DERECHA
 	public void rotateSinHPoint(int ang, int nf) {
 		//xcos - ysen - Txcos + Tysen + Tx, xsen +ycos - Txsen - Tycos + Ty
 		if(nf == 1)
@@ -163,6 +163,7 @@ public class Figure {
 		}
 	}
 	
+	//ROTAR FIGURA A LA IZQUIERDA
 	public void rotateCosHPoint(int ang, int nf) {
 		//xcos + ysen - Txcos - Tysen + Tx, -xsen +ycos + Txsen - Tycos + Ty
 		if(nf == 1)

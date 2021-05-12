@@ -8,6 +8,7 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.ImageObserver;
@@ -27,7 +28,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 
-public class MainInterface extends JPanel{
+public class MainInterface extends JPanel implements ActionListener{
 	JFrame W;
 	JPanel pestaña1,pestaña2;
 	JMenuBar menuBar;
@@ -263,21 +264,21 @@ public class MainInterface extends JPanel{
 		}
 		menu2.add(menuOptions[7]); menu2.add(menuOptions[8]); //Los últimos items se agregan al otro menu
 		
-		//menuOptions[0].addActionListener(this);
+		menuOptions[0].addActionListener(this);
 		menuOptions[0].setMnemonic('R');
 		menuOptions[0].setToolTipText("Restaura la figura a su forma originaL");
 		ruta = getClass().getResource("/Resources/undo.png");
 		menuOptions[0].setIcon(new ImageIcon(ruta));
 		menuOptions[0].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,InputEvent.ALT_MASK));
 		
-		//menuOptions[1].addActionListener(this);
+		menuOptions[1].addActionListener(this);
 		menuOptions[1].setMnemonic('E');
 		menuOptions[1].setToolTipText("Cambia el tamaño de la figura");
 		ruta = getClass().getResource("/Resources/scale.png");
 		menuOptions[1].setIcon(new ImageIcon(ruta));
 		menuOptions[1].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,InputEvent.ALT_MASK));
 		
-		//menuOptions[2].addActionListener(this);
+		menuOptions[2].addActionListener(this);
 		menuOptions[2].setMnemonic('D');
 		menuOptions[2].setToolTipText("Cambia la forma de la figura");
 		ruta = getClass().getResource("/Resources/sheary.png");
@@ -323,6 +324,32 @@ public class MainInterface extends JPanel{
 		ruta = getClass().getResource("/Resources/help.png");
 		menuOptions[8].setIcon(new ImageIcon(ruta));
 		menuOptions[8].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H,InputEvent.ALT_MASK));
+	}
+	
+	//EVENTOS AL ESCOGER UNA DE LAS OPCIONES DE LA BARRA DE MENU
+	public void actionPerformed(ActionEvent ev) {
+		if(ev.getSource() == menuOptions[0])  //Restaurar figura con Restautrar o Alt+R
+			if(pestañas.getSelectedIndex() == 0)
+				fig1.restore(1);
+			else
+				fig2.restore(2);
+			
+		else
+			if(ev.getSource() == menuOptions[1]) { 
+				double esc = new ScaleDialog(MainInterface.this,true).showDialog();
+				if(pestañas.getSelectedIndex() == 0)
+					fig1.scaleHPoint(esc,1);
+				else
+					fig2.scaleHPoint(esc,2);
+			}else
+				if(ev.getSource() == menuOptions[2]) {
+					double[] she = new ShearyDialog(MainInterface.this,true).showDialog();
+					if(pestañas.getSelectedIndex() == 0)
+						fig1.shearyHPoint(she[0],she[1],1);
+					else
+						fig2.shearyHPoint(she[0],she[1],2);
+				}
+		pestañas.repaint();
 	}
 	
 	//MÉTODO MAIN PARA INICIAR PROGRAMA
