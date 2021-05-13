@@ -9,21 +9,21 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
-public class ShearyDialog extends JDialog{
-	double cantShe[]=new double[2];
+public class TranslateDialog extends JDialog{
+	int cantTrans[]=new int[2];
 	JLabel lbl1,lbl2,lbl3;
 	JTextField tf1,tf2;
 	JButton btnAllow,btnCancel;
 	
-	public ShearyDialog(MainInterface w,boolean modal) {
+	public TranslateDialog(MainInterface w,boolean modal) {
 		super(w.W,modal);
-		setTitle("Deformar la figura");
+		setTitle("Trasladar la figura");
 		setSize(600,120);
 		setLayout(new FlowLayout());
 		setLocationRelativeTo(w.W);
 		this.setBackground(w.uno);
 		
-		URL ruta = getClass().getResource("/Resources/sheary.png");
+		URL ruta = getClass().getResource("/Resources/move.png");
 		lbl1 = new JLabel(new ImageIcon(ruta));
 		lbl2 = new JLabel("Cantidad a deformar en x");
 		lbl2.setForeground(w.dos);
@@ -43,11 +43,11 @@ public class ShearyDialog extends JDialog{
 			public void actionPerformed(ActionEvent e) {
 				String res1 = tf1.getText(), res2 = tf2.getText();
 				try {
-					cantShe[0]=Double.parseDouble(res1);
-					cantShe[1]=Double.parseDouble(res2);
+					cantTrans[0]=Integer.parseInt(res1);
+					cantTrans[1]=Integer.parseInt(res2);
 				}catch (NumberFormatException e1) {
-					cantShe[0]=0.0;
-					cantShe[1]=0.0;
+					cantTrans[0]=0;
+					cantTrans[1]=0;
 				}
 				setVisible(false);
 				dispose();
@@ -56,8 +56,8 @@ public class ShearyDialog extends JDialog{
 		
 		btnCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				cantShe[0]=0.0;
-				cantShe[1]=0.0;
+				cantTrans[0]=0;
+				cantTrans[1]=0;
 				setVisible(false);
 				dispose();
 			}
@@ -66,8 +66,8 @@ public class ShearyDialog extends JDialog{
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 	}
 	
-	public double[] showDialog() {
+	public int[] showDialog() {
 		setVisible(true);
-		return cantShe;
+		return cantTrans;
 	}
 }

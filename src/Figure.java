@@ -194,7 +194,7 @@ public class Figure {
 	}
 	
 	//REFLEJAR FIGURA
-	public void reflectHPoint(double refx, double refy, int nf) {
+	public void reflectHPoint(int refx, int refy, int nf) {
 		// xRx - TxRx + Tx, yRy - TyRy + Ty
 		if(nf == 1)
 			figaux = fig1;

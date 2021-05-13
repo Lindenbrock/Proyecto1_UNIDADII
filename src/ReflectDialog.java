@@ -11,57 +11,53 @@ import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-public class RotateDialog extends JDialog{
-	int cantRot[] = new int[2];
+public class ReflectDialog extends JDialog{
+	int rotType;
 	JLabel lbl1,lbl2,lbl3;
-	JTextField tf1,tf2,tf3;
-	JRadioButton rb1,rb2;
+	JRadioButton rb1,rb2,rb3;
 	ButtonGroup rbg;
 	JButton btnAllow,btnCancel;
 	
-	public RotateDialog(MainInterface w,boolean modal) {
+	public ReflectDialog(MainInterface w,boolean modal) {
 		super(w.W,modal);
-		setTitle("Rotar la figura");
+		setTitle("Reflejar la figura");
 		setSize(600,120);
 		setLayout(new FlowLayout());
 		setLocationRelativeTo(w.W);
 		this.setBackground(w.uno);
 		
-		lbl1 = new JLabel("Cantidad a rotar");
-		lbl1.setForeground(w.dos);
-		tf1 = new JTextField(10);
-		rbg = new ButtonGroup();
-		URL ruta = getClass().getResource("/Resources/rotate-left.png");
+		URL ruta = getClass().getResource("/Resources/refx.png");
+		lbl1 = new JLabel(new ImageIcon(ruta));
+		ruta = getClass().getResource("/Resources/refy.png");
 		lbl2 = new JLabel(new ImageIcon(ruta));
-		rb1 = new JRadioButton("Rotar a la izquerda");
+		ruta = getClass().getResource("/Resources/refxy.png");
+		lbl3 = new JLabel(new ImageIcon(ruta));
+		rbg = new ButtonGroup();
+		rb1 = new JRadioButton("Reflejar en X");
 		rb1.setForeground(w.dos);
 		rb1.setSelected(true);
-		ruta = getClass().getResource("/Resources/rotate-right.png");
-		lbl3 = new JLabel(new ImageIcon(ruta));
-		rb2 = new JRadioButton("Rotar a la derecha");
+		rb2 = new JRadioButton("Reflejar en Y");
 		rb2.setForeground(w.dos);
-		rbg.add(rb1); rbg.add(rb2);
+		rb3 = new JRadioButton("Reflejar en X y Y");
+		rb3.setForeground(w.dos);
+		rbg.add(rb1); rbg.add(rb2); rbg.add(rb3);
 		btnAllow = new JButton("Aceptar");
 		btnAllow.setBackground(w.tres);
 		btnAllow.setForeground(w.uno);
 		btnCancel = new JButton("Cancelar");
 		btnCancel.setBackground(w.tres);
 		btnCancel.setForeground(w.uno);
-		add(lbl1); add(tf1); add(lbl2); add(rb1); add(lbl3); add(rb2); add(btnAllow); add(btnCancel);
+		add(lbl1); add(rb1); add(lbl2); add(rb2); add(lbl3); add(rb3);  add(btnAllow); add(btnCancel);
 		
 		btnAllow.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {					
-				String res = tf1.getText();
-				try {
-					cantRot[0]=Integer.parseInt(res);
-				}catch (NumberFormatException e1) {
-					cantRot[0]=0;
-				}
-				if(rb1.isSelected())
-					cantRot[1]=1;
+			public void actionPerformed(ActionEvent e) {
+				if(rb1.isSelected()) 
+					rotType = 1;
 				else
-					cantRot[1]=2;
-					
+					if(rb2.isSelected())
+						rotType = 2;
+					else
+						rotType = 3;
 				setVisible(false);
 				dispose();
 			}	
@@ -69,8 +65,7 @@ public class RotateDialog extends JDialog{
 		
 		btnCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				cantRot[0]=0;
-				cantRot[1]=1;
+				rotType = 4;
 				setVisible(false);
 				dispose();
 			}
@@ -79,8 +74,8 @@ public class RotateDialog extends JDialog{
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 	}
 	
-	public int[] showDialog() {
+	public int showDialog() {
 		setVisible(true);
-		return cantRot;
+		return rotType;
 	}
 }

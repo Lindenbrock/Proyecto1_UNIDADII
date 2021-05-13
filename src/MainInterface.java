@@ -251,7 +251,7 @@ public class MainInterface extends JPanel implements ActionListener{
 		
 		menuBar.add(menu1); menuBar.add(menu2);
 		
-		mOptions = new String[] {"Restaurar","Escalar","Deformar","Rotar","Trasladar",  //Se crea arreglo de nombres de las opciones del menu
+		mOptions = new String[] {"Restaurar","Escalar","Deformar","Girar","Trasladar",  //Se crea arreglo de nombres de las opciones del menu
 								"Reflejar","Salir","Desarrollador","Ayuda"};		   //para no hacer el
 		menuOptions = new JMenuItem[9];	//Se crea arreglo de pciones
 		
@@ -269,7 +269,7 @@ public class MainInterface extends JPanel implements ActionListener{
 		menuOptions[0].setToolTipText("Restaura la figura a su forma originaL");
 		ruta = getClass().getResource("/Resources/undo.png");
 		menuOptions[0].setIcon(new ImageIcon(ruta));
-		menuOptions[0].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,InputEvent.ALT_MASK));
+		menuOptions[0].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U,InputEvent.ALT_MASK));
 		
 		menuOptions[1].addActionListener(this);
 		menuOptions[1].setMnemonic('E');
@@ -283,35 +283,35 @@ public class MainInterface extends JPanel implements ActionListener{
 		menuOptions[2].setToolTipText("Cambia la forma de la figura");
 		ruta = getClass().getResource("/Resources/sheary.png");
 		menuOptions[2].setIcon(new ImageIcon(ruta));
-		menuOptions[2].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D,InputEvent.ALT_MASK));
+		menuOptions[2].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,InputEvent.ALT_MASK));
 		
-		//menuOptions[3].addActionListener(this);
-		menuOptions[3].setMnemonic('S');
-		menuOptions[3].setToolTipText("Rota la figura");
+		menuOptions[3].addActionListener(this);
+		menuOptions[3].setMnemonic('G');
+		menuOptions[3].setToolTipText("Gira la figura");
 		ruta = getClass().getResource("/Resources/rotate-right.png");
 		menuOptions[3].setIcon(new ImageIcon(ruta));
-		menuOptions[3].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,InputEvent.ALT_MASK));
+		menuOptions[3].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,InputEvent.ALT_MASK));
 		
-		//menuOptions[4].addActionListener(this);
+		menuOptions[4].addActionListener(this);
 		menuOptions[4].setMnemonic('T');
 		menuOptions[4].setToolTipText("Traslada la figura a un pundo deseado");
 		ruta = getClass().getResource("/Resources/move.png");
 		menuOptions[4].setIcon(new ImageIcon(ruta));
 		menuOptions[4].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T,InputEvent.ALT_MASK));
 		
-		//menuOptions[5].addActionListener(this);
-		menuOptions[5].setMnemonic('X');
+		menuOptions[5].addActionListener(this);
+		menuOptions[5].setMnemonic('R');
 		menuOptions[5].setToolTipText("Refleja la figura");
 		ruta = getClass().getResource("/Resources/refy.png");
 		menuOptions[5].setIcon(new ImageIcon(ruta));
-		menuOptions[5].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,InputEvent.ALT_MASK));
+		menuOptions[5].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F,InputEvent.ALT_MASK));
 		
 		//menuOptions[6].addActionListener(this);
-		menuOptions[6].setMnemonic('Q');
+		menuOptions[6].setMnemonic('S');
 		menuOptions[6].setToolTipText("Salir del programa");
 		ruta = getClass().getResource("/Resources/exit.png");
 		menuOptions[6].setIcon(new ImageIcon(ruta));
-		menuOptions[6].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q,InputEvent.ALT_MASK));
+		menuOptions[6].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E,InputEvent.ALT_MASK));
 		
 		menuOptions[7].setMnemonic('A');
 		menuOptions[7].setToolTipText("Muestra la información del desarrollador");
@@ -348,7 +348,48 @@ public class MainInterface extends JPanel implements ActionListener{
 						fig1.shearyHPoint(she[0],she[1],1);
 					else
 						fig2.shearyHPoint(she[0],she[1],2);
-				}
+				}else
+					if(ev.getSource() == menuOptions[3]) {
+						int[] rot = new RotateDialog(MainInterface.this,true).showDialog();
+						if(rot[1] == 1)
+							if(pestañas.getSelectedIndex() == 0)
+								fig1.rotateCosHPoint(rot[0],1);
+							else
+								fig2.rotateCosHPoint(rot[0],2);
+						else
+							if(pestañas.getSelectedIndex() == 0)
+								fig1.rotateSinHPoint(rot[0],1);
+							else
+								fig2.rotateSinHPoint(rot[0],2);
+					}else
+						if(ev.getSource() == menuOptions[4]) {
+							int[] move= new TranslateDialog(MainInterface.this,true).showDialog();
+							if(pestañas.getSelectedIndex() == 0)
+								fig1.movePoint(move[0],move[1],1);
+							else
+								fig2.movePoint(move[0],move[1],2);
+						}else
+							if(ev.getSource() == menuOptions[5]) {
+								int ans = new ReflectDialog(MainInterface.this,true).showDialog(),refx,refy;
+								if(ans == 1) {
+									refx = 1; refy = -1;
+								} else 
+									if(ans == 2) {
+										refx = -1; refy = 1;
+									} else 
+										if(ans == 3) {
+											refx = -1; refy = -1;
+										}
+									
+										else {
+											refx = 1; refy = 1;
+										}
+								
+								if(pestañas.getSelectedIndex() == 0)
+									fig1.reflectHPoint(refx,refy,1);
+								else
+									fig2.reflectHPoint(refx,refy,2);
+							}
 		pestañas.repaint();
 	}
 	
