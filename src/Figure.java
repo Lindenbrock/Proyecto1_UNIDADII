@@ -70,7 +70,7 @@ public class Figure {
 	}
 	
 	//MAPEO DE LAS FIGURAS CREADAS
-	public void windowMap(int xvmax, int xvmin, int yvmax, int yvmin, int xwmax, int ywmax, Graphics g,int nf) {
+	public void windowMapping(int xvmax, int xvmin, int yvmax, int yvmin, int xwmax, int ywmax, Graphics g,int nf) {
 		double sx = (double)(xvmax - xvmin) / (double)(xwmax - 0),  sy = (double)(yvmax - yvmin) / (double)(ywmax - 0);
 		
 		if(nf == 1) {
@@ -91,7 +91,7 @@ public class Figure {
 	}
 	
 	//DIBUJANDO LAS FIGURAS
-	public void DibujarVecPuntos(Graphics g, int nf) {
+	public void drawPointVector(Graphics g, int nf) {
 		if(nf == 1) {
 			figaux = fig1; figMapAux = figMap1;
 		}else {
@@ -102,8 +102,8 @@ public class Figure {
 			g.drawLine((int)figaux[p1].x,(int)figaux[p1].y,(int)figaux[p2].x,(int)figaux[p2].y);
 	}
 	
-	//DEVOLVER COORDENADAS DE LA FIGURA
-	public Point getFigureCoordinates(int nf){
+	//DEVOLVER COORDENADAS X DE LA FIGURA
+	public Point getFigureXCoordinates(int nf){
 		if(nf == 1)
 			figaux = fig1;
 		else
@@ -119,11 +119,28 @@ public class Figure {
 		return p;
 	}
 	
+	//DEVOLVER COORDENADAS Y DE LA FIGURA
+		public Point getFigureYCoordinates(int nf){
+			if(nf == 1)
+				figaux = fig1;
+			else
+				figaux = fig2;
+			
+			Point p = new Point((int)figaux[0].y,(int)figaux[0].y);		
+			for(int i=1;i<figaux.length;i++) {
+				if(figaux[i].y < p.x)
+					p.x = (int) figaux[i].y;
+				if(figaux[i].y > p.y)
+					p.y = (int) figaux[i].y;
+			}
+			return p;
+		}
+	
 	
 	/*-----  TRANSFORMACIONES PRINCIPALES DE LAS FIGURAS  -----*/
 	
 	//RESTAURAR FIGURA
-	public void restore(int nf) {
+	public void restorePoint(int nf) {
 		if(nf == 1) 
 			for(int  pos=0,i=0,j=1;i<puntosf1.length-1;i+=2,pos++,j+=2)
 				fig1[pos]=new punto2D(puntosf1[i],puntosf1[j]);

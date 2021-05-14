@@ -1,25 +1,18 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.image.ImageObserver;
 import java.net.URL;
-import java.text.AttributedCharacterIterator;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -38,7 +31,7 @@ public class MainInterface extends JPanel implements ActionListener, MouseWheelL
 	JFrame W;
 	JPanel pestaña1,pestaña2;
 	JMenuBar menuBar;
-	JMenuItem menuOptions[]; //Para no demorar en la inicialización de los items
+	JMenuItem menuOptions[];
 	JMenu menu1,menu2;
 	JToolBar toolBar;
 	String mOptions[];
@@ -47,6 +40,7 @@ public class MainInterface extends JPanel implements ActionListener, MouseWheelL
 	URL ruta;
 	Figure fig1,fig2;
 	Image Background;
+	boolean move=false;
 	
 	public MainInterface() {
 		W = new JFrame("Transformaciones");
@@ -64,40 +58,12 @@ public class MainInterface extends JPanel implements ActionListener, MouseWheelL
 		buildToolBar();
 		buildTabbedPane();
 		
-		fig1 = new Figure();
-		fig2 = new Figure();
-		
-		W.addMouseWheelListener(this); //Evento para editar tamaño con la rueda del ratón
-		
-		//EVENTOS DE CLICK DEL RATON: MOVER FIGURA Y ROTAR FIGURA
-		W.addMouseListener(new MouseAdapter() {
-			public void mousePressed(MouseEvent e) {
-				int cX = e.getX(),cY = e.getY(),nf;
-				Point pf;
-				if(pestañas.getSelectedIndex() == 0) {
-					pf = fig1.getFigureCoordinates(1);
-					nf = 1;
-				} else {
-					pf = fig2.getFigureCoordinates(2);
-					nf = 2;
-				}
-					
-				if(cX < pf.x)
-					if(nf == 1)
-						fig1.rotateSinHPoint(2, nf);
-					else
-						fig2.rotateSinHPoint(2, nf);
-				pestañas.repaint(); 
-			}
-		});
-		
-		
 		W.setVisible(true);
 		W.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
 	//CONSTRUYENDO LAS PESTAÑAS QUE MUESTRAN LAS FIGURAS
-	private void buildTabbedPane() {
+	public void buildTabbedPane() {
 		pestañas = new JTabbedPane();
 		pestañas.setBackground(cuatro);
 		W.add(pestañas);
@@ -113,8 +79,8 @@ public class MainInterface extends JPanel implements ActionListener, MouseWheelL
 				int maxx=getWidth(),maxy=getHeight();
 				g.setColor(tres);
 				g.fillRect(maxx-300,maxy-200,300,200);
-				fig1.DibujarVecPuntos(g,1);
-				fig1.windowMap(maxx, maxx-300, maxy, maxy-200, maxx, maxy, g, 1);
+				fig1.drawPointVector(g,1);
+				fig1.windowMapping(maxx, maxx-300, maxy, maxy-200, maxx, maxy, g, 1);
 			}
 		};
 		
@@ -126,13 +92,80 @@ public class MainInterface extends JPanel implements ActionListener, MouseWheelL
 				int maxx=getWidth(),maxy=getHeight();
 				g.setColor(tres);
 				g.fillRect(maxx-300,maxy-200,300,200);
-				fig2.DibujarVecPuntos(g,2);
-				fig2.windowMap(maxx, maxx-300, maxy, maxy-200, maxx, maxy, g, 2);
+				fig2.drawPointVector(g,2);
+				fig2.windowMapping(maxx, maxx-300, maxy, maxy-200, maxx, maxy, g, 2);
 			}
 		};
 		
 		pestañas.add(pestaña1,"Figura 1");
 		pestañas.add(pestaña2,"Figura 2");
+		
+		fig1 = new Figure();
+		fig2 = new Figure();
+		
+		pestañas.addMouseWheelListener(this); //Evento para editar tamaño con la rueda del ratón
+		
+		//EVENTOS PARA ROTAR FIGURA CON CLICKS
+		pestañas.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				int cX = e.getX(),cY = e.getY(),nf;
+				Point pfx,pfy;
+				if(pestañas.getSelectedIndex() == 0) {
+					pfx = fig1.getFigureXCoordinates(1);
+					pfy = fig1.getFigureYCoordinates(1);
+					nf = 1;
+				} else {
+					pfx = fig2.getFigureXCoordinates(2);
+					pfy = fig2.getFigureYCoordinates(2);
+					nf = 2;
+				}
+					
+				if(cX < pfx.x && e.getClickCount() >= 2)
+					if(nf == 1)
+						fig1.rotateCosHPoint(5, nf);
+					else
+						fig2.rotateCosHPoint(5, nf);
+				else
+					if(cX > pfx.y && e.getClickCount() >= 2)
+						if(nf == 1)
+							fig1.rotateSinHPoint(5, nf);
+						else
+							fig2.rotateSinHPoint(5, nf);
+				
+				if((cX > pfx.x && cX < pfx.y) && (cY > pfy.x && cY < pfy.y))
+					move = true;
+				else
+					move = false;
+					
+				pestañas.repaint(); 
+			}
+		});
+		
+		//EVENTO PARA MOVER LA FIGURA CON EL ARRASTRE DEL RATÓN
+		pestañas.addMouseMotionListener(new MouseMotionAdapter() {
+			public void mouseDragged(MouseEvent e) {
+				int cX = e.getX(), cY = e.getY(), tX, tY, pcX, pcY, nf;
+				
+				if(move) {
+					if(pestañas.getSelectedIndex() == 0) {
+						pcX = (int) fig1.fig1[0].x;
+						pcY = (int) fig1.fig1[0].y;
+						nf = 1;
+					}else {
+						pcX = (int) fig2.fig2[0].x;
+						pcY = (int) fig2.fig2[0].y;
+						nf = 2;
+					}
+					tX = cX - pcX;
+					tY = cY - pcY;
+					if(nf == 1)
+						fig1.movePoint(tX, tY, nf);
+					else
+						fig2.movePoint(tX, tY, nf);
+					pestañas.repaint();
+				}
+			}
+		});
 	}
 	
 	//CONSTRUYENDO LA BARRA DE HERRAMIENTAS
@@ -146,9 +179,9 @@ public class MainInterface extends JPanel implements ActionListener, MouseWheelL
 		Action A1=new AbstractAction("", new ImageIcon(ruta)){
             public void actionPerformed(ActionEvent arg0) {
             	if(pestañas.getSelectedIndex() == 0)
-            		fig1.restore(1);
+            		fig1.restorePoint(1);
             	else
-            		fig2.restore(2);
+            		fig2.restorePoint(2);
             	pestañas.repaint();
             }};
         A1.putValue(Action.SHORT_DESCRIPTION,"Devuelve la figura a su estado original");
@@ -370,9 +403,9 @@ public class MainInterface extends JPanel implements ActionListener, MouseWheelL
 	public void actionPerformed(ActionEvent ev) {
 		if(ev.getSource() == menuOptions[0])  //Evento menu Restaurar
 			if(pestañas.getSelectedIndex() == 0)
-				fig1.restore(1);
+				fig1.restorePoint(1);
 			else
-				fig2.restore(2);
+				fig2.restorePoint(2);
 			
 		else
 			if(ev.getSource() == menuOptions[1]) {  //Evento menu Escalar
