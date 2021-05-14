@@ -25,10 +25,10 @@ public class TranslateDialog extends JDialog{
 		
 		URL ruta = getClass().getResource("/Resources/move.png");
 		lbl1 = new JLabel(new ImageIcon(ruta));
-		lbl2 = new JLabel("Cantidad a deformar en x");
+		lbl2 = new JLabel("Cantidad a trasladar en x");
 		lbl2.setForeground(w.dos);
 		tf1 = new JTextField(10);
-		lbl3 = new JLabel("Cantidad a deformar en y");
+		lbl3 = new JLabel("Cantidad a trasladar en y");
 		lbl3.setForeground(w.dos);
 		tf2 = new JTextField(10);
 		btnAllow = new JButton("Aceptar");

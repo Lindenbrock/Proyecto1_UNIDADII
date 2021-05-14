@@ -5,12 +5,18 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.ImageObserver;
 import java.net.URL;
 import java.text.AttributedCharacterIterator;
@@ -28,11 +34,11 @@ import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 
-public class MainInterface extends JPanel implements ActionListener{
+public class MainInterface extends JPanel implements ActionListener, MouseWheelListener{
 	JFrame W;
 	JPanel pestaña1,pestaña2;
 	JMenuBar menuBar;
-	JMenuItem menuOptions[]; //opcRestore,opcScale,opcSheary,opcReflection,opsTranstale,opcRotation,opcExit,opcAbout,opcHelp
+	JMenuItem menuOptions[]; //Para no demorar en la inicialización de los items
 	JMenu menu1,menu2;
 	JToolBar toolBar;
 	String mOptions[];
@@ -40,6 +46,7 @@ public class MainInterface extends JPanel implements ActionListener{
 	JTabbedPane pestañas;
 	URL ruta;
 	Figure fig1,fig2;
+	Image Background;
 	
 	public MainInterface() {
 		W = new JFrame("Transformaciones");
@@ -60,20 +67,49 @@ public class MainInterface extends JPanel implements ActionListener{
 		fig1 = new Figure();
 		fig2 = new Figure();
 		
+		W.addMouseWheelListener(this); //Evento para editar tamaño con la rueda del ratón
+		
+		//EVENTOS DE CLICK DEL RATON: MOVER FIGURA Y ROTAR FIGURA
+		W.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				int cX = e.getX(),cY = e.getY(),nf;
+				Point pf;
+				if(pestañas.getSelectedIndex() == 0) {
+					pf = fig1.getFigureCoordinates(1);
+					nf = 1;
+				} else {
+					pf = fig2.getFigureCoordinates(2);
+					nf = 2;
+				}
+					
+				if(cX < pf.x)
+					if(nf == 1)
+						fig1.rotateSinHPoint(2, nf);
+					else
+						fig2.rotateSinHPoint(2, nf);
+				pestañas.repaint(); 
+			}
+		});
+		
+		
 		W.setVisible(true);
 		W.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
-	//CREANDO LAS PESTAÑAS QUE CONTENDRÁN LAS FIGURAS
+	//CONSTRUYENDO LAS PESTAÑAS QUE MUESTRAN LAS FIGURAS
 	private void buildTabbedPane() {
 		pestañas = new JTabbedPane();
 		pestañas.setBackground(cuatro);
 		W.add(pestañas);
 		
+		ruta = getClass().getResource("/Resources/grid1.jpg"); //Fonde de las pestañas
+		Background = new ImageIcon(ruta).getImage();
+		
 		//Pintar figura en la pestaña 1
 		pestaña1 = new JPanel() {
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
+				g.drawImage(Background, 0, 0,pestaña1.getWidth(),pestaña1.getHeight(),pestaña1);
 				int maxx=getWidth(),maxy=getHeight();
 				g.setColor(tres);
 				g.fillRect(maxx-300,maxy-200,300,200);
@@ -86,6 +122,7 @@ public class MainInterface extends JPanel implements ActionListener{
 		pestaña2 = new JPanel(){
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
+				g.drawImage(Background, 0, 0,pestaña2.getWidth(),pestaña2.getHeight(),pestaña2);
 				int maxx=getWidth(),maxy=getHeight();
 				g.setColor(tres);
 				g.fillRect(maxx-300,maxy-200,300,200);
@@ -105,7 +142,7 @@ public class MainInterface extends JPanel implements ActionListener{
 		toolBar.setFloatable(false);
 		W.add(toolBar,BorderLayout.WEST);
 		
-		URL ruta = getClass().getResource("/Resources/undo.png"); //Botón de restaurar
+		ruta = getClass().getResource("/Resources/undo.png"); //Botón de restaurar
 		Action A1=new AbstractAction("", new ImageIcon(ruta)){
             public void actionPerformed(ActionEvent arg0) {
             	if(pestañas.getSelectedIndex() == 0)
@@ -204,7 +241,7 @@ public class MainInterface extends JPanel implements ActionListener{
             		fig2.scaleHPoint(1.1,2);
             	pestañas.repaint();
             }};
-        A7.putValue(Action.SHORT_DESCRIPTION,"Aumenta el tamaño de la figuras");
+        A7.putValue(Action.SHORT_DESCRIPTION,"Aumenta el tamaño de la figura");
         JButton btnA7 = new JButton(A7);
         btnA7.setBorder(null);
         btnA7.setBackground(uno);
@@ -228,7 +265,9 @@ public class MainInterface extends JPanel implements ActionListener{
         ruta = getClass().getResource("/Resources/exit.png"); //Salir del programa
         Action A9=new AbstractAction("",new ImageIcon(ruta)){
             public void actionPerformed(ActionEvent arg0) {
-            	System.exit(0);
+            	boolean ans = new ExitDialog(MainInterface.this,true).showDialog();
+				if(ans)
+					System.exit(0);
             }};
         A9.putValue(Action.SHORT_DESCRIPTION,"Salir del programa");
         JButton btnA9 = new JButton(A9);
@@ -252,7 +291,7 @@ public class MainInterface extends JPanel implements ActionListener{
 		menuBar.add(menu1); menuBar.add(menu2);
 		
 		mOptions = new String[] {"Restaurar","Escalar","Deformar","Girar","Trasladar",  //Se crea arreglo de nombres de las opciones del menu
-								"Reflejar","Salir","Desarrollador","Ayuda"};		   //para no hacer el
+								"Reflejar","Salir","Autor","Ayuda"};		   //para no hacer el
 		menuOptions = new JMenuItem[9];	//Se crea arreglo de pciones
 		
 		for(int i=0;i<mOptions.length;i++) {		//Ciclo para crear cada uno de los item del menú en un ciclo
@@ -264,92 +303,93 @@ public class MainInterface extends JPanel implements ActionListener{
 		}
 		menu2.add(menuOptions[7]); menu2.add(menuOptions[8]); //Los últimos items se agregan al otro menu
 		
-		menuOptions[0].addActionListener(this);
+		menuOptions[0].addActionListener(this);  //Opción para restaurar
 		menuOptions[0].setMnemonic('R');
 		menuOptions[0].setToolTipText("Restaura la figura a su forma originaL");
 		ruta = getClass().getResource("/Resources/undo.png");
 		menuOptions[0].setIcon(new ImageIcon(ruta));
 		menuOptions[0].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U,InputEvent.ALT_MASK));
 		
-		menuOptions[1].addActionListener(this);
+		menuOptions[1].addActionListener(this);  //Opción para escalar
 		menuOptions[1].setMnemonic('E');
 		menuOptions[1].setToolTipText("Cambia el tamaño de la figura");
 		ruta = getClass().getResource("/Resources/scale.png");
 		menuOptions[1].setIcon(new ImageIcon(ruta));
 		menuOptions[1].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,InputEvent.ALT_MASK));
 		
-		menuOptions[2].addActionListener(this);
+		menuOptions[2].addActionListener(this);  //Opción para deformar
 		menuOptions[2].setMnemonic('D');
 		menuOptions[2].setToolTipText("Cambia la forma de la figura");
 		ruta = getClass().getResource("/Resources/sheary.png");
 		menuOptions[2].setIcon(new ImageIcon(ruta));
 		menuOptions[2].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,InputEvent.ALT_MASK));
 		
-		menuOptions[3].addActionListener(this);
+		menuOptions[3].addActionListener(this);  //Opción para girar
 		menuOptions[3].setMnemonic('G');
 		menuOptions[3].setToolTipText("Gira la figura");
 		ruta = getClass().getResource("/Resources/rotate-right.png");
 		menuOptions[3].setIcon(new ImageIcon(ruta));
 		menuOptions[3].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,InputEvent.ALT_MASK));
 		
-		menuOptions[4].addActionListener(this);
+		menuOptions[4].addActionListener(this);  //Opción para trasladar
 		menuOptions[4].setMnemonic('T');
 		menuOptions[4].setToolTipText("Traslada la figura a un pundo deseado");
 		ruta = getClass().getResource("/Resources/move.png");
 		menuOptions[4].setIcon(new ImageIcon(ruta));
 		menuOptions[4].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T,InputEvent.ALT_MASK));
 		
-		menuOptions[5].addActionListener(this);
+		menuOptions[5].addActionListener(this); //Opción para felejar
 		menuOptions[5].setMnemonic('R');
 		menuOptions[5].setToolTipText("Refleja la figura");
 		ruta = getClass().getResource("/Resources/refy.png");
 		menuOptions[5].setIcon(new ImageIcon(ruta));
 		menuOptions[5].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F,InputEvent.ALT_MASK));
 		
-		//menuOptions[6].addActionListener(this);
+		menuOptions[6].addActionListener(this);  //Opción para salir del programa
 		menuOptions[6].setMnemonic('S');
 		menuOptions[6].setToolTipText("Salir del programa");
 		ruta = getClass().getResource("/Resources/exit.png");
 		menuOptions[6].setIcon(new ImageIcon(ruta));
 		menuOptions[6].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E,InputEvent.ALT_MASK));
 		
+		menuOptions[7].addActionListener(this);  //Opción para información del desarrollador
 		menuOptions[7].setMnemonic('A');
 		menuOptions[7].setToolTipText("Muestra la información del desarrollador");
 		ruta = getClass().getResource("/Resources/developer.png");
 		menuOptions[7].setIcon(new ImageIcon(ruta));
 		menuOptions[7].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A,InputEvent.ALT_MASK));
 		
-		menuOptions[8].setMnemonic('H');
+		menuOptions[8].setMnemonic('H');  //Opción para ventana de ayuda
 		menuOptions[8].setToolTipText("Muestra una ayudar sobre el funcionamiento del programa");
 		ruta = getClass().getResource("/Resources/help.png");
 		menuOptions[8].setIcon(new ImageIcon(ruta));
 		menuOptions[8].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H,InputEvent.ALT_MASK));
 	}
 	
-	//EVENTOS AL ESCOGER UNA DE LAS OPCIONES DE LA BARRA DE MENU
+	//EVENTOS OPCIONES DE LA BARRA DE MENU
 	public void actionPerformed(ActionEvent ev) {
-		if(ev.getSource() == menuOptions[0])  //Restaurar figura con Restautrar o Alt+R
+		if(ev.getSource() == menuOptions[0])  //Evento menu Restaurar
 			if(pestañas.getSelectedIndex() == 0)
 				fig1.restore(1);
 			else
 				fig2.restore(2);
 			
 		else
-			if(ev.getSource() == menuOptions[1]) { 
+			if(ev.getSource() == menuOptions[1]) {  //Evento menu Escalar
 				double esc = new ScaleDialog(MainInterface.this,true).showDialog();
 				if(pestañas.getSelectedIndex() == 0)
 					fig1.scaleHPoint(esc,1);
 				else
 					fig2.scaleHPoint(esc,2);
 			}else
-				if(ev.getSource() == menuOptions[2]) {
+				if(ev.getSource() == menuOptions[2]) {  //Evento menu Deformar
 					double[] she = new ShearyDialog(MainInterface.this,true).showDialog();
 					if(pestañas.getSelectedIndex() == 0)
 						fig1.shearyHPoint(she[0],she[1],1);
 					else
 						fig2.shearyHPoint(she[0],she[1],2);
 				}else
-					if(ev.getSource() == menuOptions[3]) {
+					if(ev.getSource() == menuOptions[3]) {  //Evento menu Rotar
 						int[] rot = new RotateDialog(MainInterface.this,true).showDialog();
 						if(rot[1] == 1)
 							if(pestañas.getSelectedIndex() == 0)
@@ -362,14 +402,14 @@ public class MainInterface extends JPanel implements ActionListener{
 							else
 								fig2.rotateSinHPoint(rot[0],2);
 					}else
-						if(ev.getSource() == menuOptions[4]) {
+						if(ev.getSource() == menuOptions[4]) {  //Evento menu Trasladar
 							int[] move= new TranslateDialog(MainInterface.this,true).showDialog();
 							if(pestañas.getSelectedIndex() == 0)
 								fig1.movePoint(move[0],move[1],1);
 							else
 								fig2.movePoint(move[0],move[1],2);
 						}else
-							if(ev.getSource() == menuOptions[5]) {
+							if(ev.getSource() == menuOptions[5]) {  //Evento menu Reflejar
 								int ans = new ReflectDialog(MainInterface.this,true).showDialog(),refx,refy;
 								if(ans == 1) {
 									refx = 1; refy = -1;
@@ -389,7 +429,31 @@ public class MainInterface extends JPanel implements ActionListener{
 									fig1.reflectHPoint(refx,refy,1);
 								else
 									fig2.reflectHPoint(refx,refy,2);
-							}
+							}else
+								if(ev.getSource() == menuOptions[6]) {  //Evento menu Salir
+									boolean ans = new ExitDialog(MainInterface.this,true).showDialog();
+									if(ans)
+										System.exit(0);
+								}else
+									if(ev.getSource() == menuOptions[7]) //Evento menu Información del desarrollado
+										new AboutDialog(MainInterface.this,true).showDialog();
+		pestañas.repaint();
+	}
+	
+	//EVENTO DE RUEDA DEL RATÓN PARA AUMENTAR O DISMINUIR EL TAMAÑO
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent ev) {
+		int wSense = ev.getWheelRotation();
+		double esc;
+		if(wSense < 0)
+			esc = 0.95;
+		else
+			esc = 1.05;
+		
+		if(pestañas.getSelectedIndex() == 0)
+			fig1.scaleHPoint(esc,1);
+		else
+			fig2.scaleHPoint(esc,2);
 		pestañas.repaint();
 	}
 	

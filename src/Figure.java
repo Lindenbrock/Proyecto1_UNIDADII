@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Point;
 
 class punto2D{
 	double x,y;
@@ -99,6 +100,23 @@ public class Figure {
 		g.setColor(tres);
 		for(int p1=1,p2=2;p1<figaux.length-1;p1+=1,p2+=1) 
 			g.drawLine((int)figaux[p1].x,(int)figaux[p1].y,(int)figaux[p2].x,(int)figaux[p2].y);
+	}
+	
+	//DEVOLVER COORDENADAS DE LA FIGURA
+	public Point getFigureCoordinates(int nf){
+		if(nf == 1)
+			figaux = fig1;
+		else
+			figaux = fig2;
+		
+		Point p = new Point((int)figaux[0].x,(int)figaux[0].x);		
+		for(int i=1;i<figaux.length;i++) {
+			if(figaux[i].x < p.x)
+				p.x = (int) figaux[i].x;
+			if(figaux[i].x > p.y)
+				p.y = (int) figaux[i].x;
+		}
+		return p;
 	}
 	
 	

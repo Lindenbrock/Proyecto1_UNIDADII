@@ -21,7 +21,7 @@ public class ReflectDialog extends JDialog{
 	public ReflectDialog(MainInterface w,boolean modal) {
 		super(w.W,modal);
 		setTitle("Reflejar la figura");
-		setSize(600,120);
+		setSize(500,120);
 		setLayout(new FlowLayout());
 		setLocationRelativeTo(w.W);
 		this.setBackground(w.uno);
