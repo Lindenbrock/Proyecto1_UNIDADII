@@ -1,4 +1,7 @@
+import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
@@ -7,21 +10,26 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class TranslateDialog extends JDialog{
 	int cantTrans[]=new int[2];
-	JLabel lbl1,lbl2,lbl3;
+	JLabel lbl1,lbl2,lbl3,lblimg;
 	JTextField tf1,tf2;
 	JButton btnAllow,btnCancel;
+	JPanel pimg;
 	
 	public TranslateDialog(MainInterface w,boolean modal) {
 		super(w.W,modal);
 		setTitle("Trasladar la figura");
-		setSize(600,120);
+		setSize(600,220);
 		setLayout(new FlowLayout());
 		setLocationRelativeTo(w.W);
 		this.setBackground(w.uno);
+		
+		Image icon = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("Resources/icon.png"));
+		setIconImage(icon);
 		
 		URL ruta = getClass().getResource("/Resources/move.png");
 		lbl1 = new JLabel(new ImageIcon(ruta));
@@ -37,7 +45,11 @@ public class TranslateDialog extends JDialog{
 		btnCancel = new JButton("Cancelar");
 		btnCancel.setBackground(w.tres);
 		btnCancel.setForeground(w.uno);
-		add(lbl1); add(lbl2); add(tf1); add(lbl3); add(tf2); add(btnAllow); add(btnCancel);
+		
+		ruta = getClass().getResource("/Resources/moveg.gif");
+		lblimg = new JLabel(new ImageIcon(ruta));
+		
+		add(lbl1); add(lbl2); add(tf1); add(lbl3); add(tf2); add(lblimg); add(btnAllow); add(btnCancel);
 		
 		btnAllow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

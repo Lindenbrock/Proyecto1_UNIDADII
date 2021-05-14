@@ -1,4 +1,6 @@
 import java.awt.FlowLayout;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -18,6 +20,9 @@ public class AboutDialog extends JDialog{
 		setLayout(null);
 		setLocationRelativeTo(w.W);
 		this.setBackground(w.uno);
+		
+		Image icon = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("Resources/icon.png"));
+		setIconImage(icon);
 		
 		lbl1 = new JLabel("Desarrollado por:\n");
 		lbl1.setForeground(w.dos);
@@ -52,6 +57,5 @@ public class AboutDialog extends JDialog{
 	public void showDialog() {
 		setVisible(true);
 	}
-
 	
 }

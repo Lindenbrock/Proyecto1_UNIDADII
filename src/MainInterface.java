@@ -3,6 +3,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -27,7 +28,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 
-public class MainInterface extends JPanel implements ActionListener, MouseWheelListener{
+public class MainInterface extends JFrame implements ActionListener, MouseWheelListener{
 	JFrame W;
 	JPanel pestaña1,pestaña2;
 	JMenuBar menuBar;
@@ -39,15 +40,19 @@ public class MainInterface extends JPanel implements ActionListener, MouseWheelL
 	JTabbedPane pestañas;
 	URL ruta;
 	Figure fig1,fig2;
-	Image Background;
+	Image Background,icon;
 	boolean move=false;
 	
 	public MainInterface() {
-		W = new JFrame("Transformaciones");
-		W.setSize(1000,600);
-		W.setLocationRelativeTo(this);
-		W.setResizable(false);
-		W.add(this);
+		setSize(1000,600);
+		setLocationRelativeTo(this);
+		setResizable(false);
+		setTitle("Trasformaciones UI");
+
+		
+		//Icono de la interfaz
+		icon = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("Resources/icon.png"));
+		setIconImage(icon);
 		
 		uno = new Color(247,247,247);
 		dos = new Color(59,9,68);
@@ -58,15 +63,15 @@ public class MainInterface extends JPanel implements ActionListener, MouseWheelL
 		buildToolBar();
 		buildTabbedPane();
 		
-		W.setVisible(true);
-		W.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setVisible(true);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
 	//CONSTRUYENDO LAS PESTAÑAS QUE MUESTRAN LAS FIGURAS
 	public void buildTabbedPane() {
 		pestañas = new JTabbedPane();
 		pestañas.setBackground(cuatro);
-		W.add(pestañas);
+		add(pestañas);
 		
 		ruta = getClass().getResource("/Resources/grid1.jpg"); //Fonde de las pestañas
 		Background = new ImageIcon(ruta).getImage();
@@ -173,15 +178,17 @@ public class MainInterface extends JPanel implements ActionListener, MouseWheelL
 		toolBar = new JToolBar("",JToolBar.VERTICAL);
 		toolBar.setBackground(uno);
 		toolBar.setFloatable(false);
-		W.add(toolBar,BorderLayout.WEST);
+		add(toolBar,BorderLayout.WEST);
 		
 		ruta = getClass().getResource("/Resources/undo.png"); //Botón de restaurar
 		Action A1=new AbstractAction("", new ImageIcon(ruta)){
             public void actionPerformed(ActionEvent arg0) {
-            	if(pestañas.getSelectedIndex() == 0)
-            		fig1.restorePoint(1);
-            	else
-            		fig2.restorePoint(2);
+            	boolean ans = new RestoreDialog(MainInterface.this,true).showDialog();
+    			if(ans)
+    				if(pestañas.getSelectedIndex() == 0)
+    					fig1.restorePoint(1);
+    				else
+    					fig2.restorePoint(2);
             	pestañas.repaint();
             }};
         A1.putValue(Action.SHORT_DESCRIPTION,"Devuelve la figura a su estado original");
@@ -214,7 +221,7 @@ public class MainInterface extends JPanel implements ActionListener, MouseWheelL
             		fig2.rotateSinHPoint(5,2);
             	pestañas.repaint();
             }};
-        A3.putValue(Action.SHORT_DESCRIPTION,"Gira la figura a la derecha");
+        A3.putValue(Action.SHORT_DESCRIPTION,"Rota la figura a la derecha");
         JButton btnA3 = new JButton(A3);
         btnA3.setBorder(null);
         btnA3.setBackground(uno);
@@ -313,7 +320,7 @@ public class MainInterface extends JPanel implements ActionListener, MouseWheelL
 	private void buildMenu() {
 		menuBar = new JMenuBar();
 		menuBar.setBackground(dos);
-		W.setJMenuBar(menuBar);
+		setJMenuBar(menuBar);
 		
 		menu1 = new JMenu("Trasformaciones");
 		menu1.setForeground(uno);
@@ -323,7 +330,7 @@ public class MainInterface extends JPanel implements ActionListener, MouseWheelL
 		
 		menuBar.add(menu1); menuBar.add(menu2);
 		
-		mOptions = new String[] {"Restaurar","Escalar","Deformar","Girar","Trasladar",  //Se crea arreglo de nombres de las opciones del menu
+		mOptions = new String[] {"Restaurar","Escalar","Deformar","Rotar","Trasladar",  //Se crea arreglo de nombres de las opciones del menu
 								"Reflejar","Salir","Autor","Ayuda"};		   //para no hacer el
 		menuOptions = new JMenuItem[9];	//Se crea arreglo de pciones
 		
@@ -392,22 +399,24 @@ public class MainInterface extends JPanel implements ActionListener, MouseWheelL
 		menuOptions[7].setIcon(new ImageIcon(ruta));
 		menuOptions[7].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A,InputEvent.ALT_MASK));
 		
-		menuOptions[8].setMnemonic('H');  //Opción para ventana de ayuda
+		menuOptions[8].addActionListener(this); //Opción para ventana de ayuda
+		menuOptions[8].setMnemonic('H');
 		menuOptions[8].setToolTipText("Muestra una ayudar sobre el funcionamiento del programa");
 		ruta = getClass().getResource("/Resources/help.png");
 		menuOptions[8].setIcon(new ImageIcon(ruta));
-		menuOptions[8].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H,InputEvent.ALT_MASK));
+		menuOptions[8].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1,InputEvent.ALT_MASK));
 	}
 	
 	//EVENTOS OPCIONES DE LA BARRA DE MENU
 	public void actionPerformed(ActionEvent ev) {
-		if(ev.getSource() == menuOptions[0])  //Evento menu Restaurar
-			if(pestañas.getSelectedIndex() == 0)
-				fig1.restorePoint(1);
-			else
-				fig2.restorePoint(2);
-			
-		else
+		if(ev.getSource() == menuOptions[0]) {  //Evento menu Restaurar
+			boolean ans = new RestoreDialog(MainInterface.this,true).showDialog();
+			if(ans)
+				if(pestañas.getSelectedIndex() == 0)
+					fig1.restorePoint(1);
+				else
+					fig2.restorePoint(2);
+		} else
 			if(ev.getSource() == menuOptions[1]) {  //Evento menu Escalar
 				double esc = new ScaleDialog(MainInterface.this,true).showDialog();
 				if(pestañas.getSelectedIndex() == 0)
@@ -470,6 +479,9 @@ public class MainInterface extends JPanel implements ActionListener, MouseWheelL
 								}else
 									if(ev.getSource() == menuOptions[7]) //Evento menu Información del desarrollado
 										new AboutDialog(MainInterface.this,true).showDialog();
+									else
+										if(ev.getSource() == menuOptions[8]) //Evento menu Ayuda
+											new HelpDialog(MainInterface.this,true).showDialog();
 		pestañas.repaint();
 	}
 	

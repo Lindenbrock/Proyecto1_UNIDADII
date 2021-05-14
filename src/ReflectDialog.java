@@ -1,4 +1,6 @@
 import java.awt.FlowLayout;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
@@ -13,7 +15,7 @@ import javax.swing.JTextField;
 
 public class ReflectDialog extends JDialog{
 	int rotType;
-	JLabel lbl1,lbl2,lbl3;
+	JLabel lbl1,lbl2,lbl3,lblimg;
 	JRadioButton rb1,rb2,rb3;
 	ButtonGroup rbg;
 	JButton btnAllow,btnCancel;
@@ -21,10 +23,13 @@ public class ReflectDialog extends JDialog{
 	public ReflectDialog(MainInterface w,boolean modal) {
 		super(w.W,modal);
 		setTitle("Reflejar la figura");
-		setSize(500,120);
+		setSize(500,200);
 		setLayout(new FlowLayout());
 		setLocationRelativeTo(w.W);
 		this.setBackground(w.uno);
+		
+		Image icon = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("Resources/icon.png"));
+		setIconImage(icon);
 		
 		URL ruta = getClass().getResource("/Resources/refx.png");
 		lbl1 = new JLabel(new ImageIcon(ruta));
@@ -47,7 +52,11 @@ public class ReflectDialog extends JDialog{
 		btnCancel = new JButton("Cancelar");
 		btnCancel.setBackground(w.tres);
 		btnCancel.setForeground(w.uno);
-		add(lbl1); add(rb1); add(lbl2); add(rb2); add(lbl3); add(rb3);  add(btnAllow); add(btnCancel);
+		
+		ruta = getClass().getResource("/Resources/refg.gif");
+		lblimg = new JLabel(new ImageIcon(ruta));
+		
+		add(lbl1); add(rb1); add(lbl2); add(rb2); add(lbl3); add(rb3); add(lblimg); add(btnAllow); add(btnCancel);
 		
 		btnAllow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

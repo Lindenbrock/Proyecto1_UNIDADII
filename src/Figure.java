@@ -136,7 +136,6 @@ public class Figure {
 			return p;
 		}
 	
-	
 	/*-----  TRANSFORMACIONES PRINCIPALES DE LAS FIGURAS  -----*/
 	
 	//RESTAURAR FIGURA

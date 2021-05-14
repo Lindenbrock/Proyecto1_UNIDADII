@@ -1,4 +1,6 @@
 import java.awt.FlowLayout;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
@@ -13,7 +15,7 @@ import javax.swing.JTextField;
 
 public class RotateDialog extends JDialog{
 	int cantRot[] = new int[2];
-	JLabel lbl1,lbl2,lbl3;
+	JLabel lbl1,lbl2,lbl3,lblimg;
 	JTextField tf1,tf2,tf3;
 	JRadioButton rb1,rb2;
 	ButtonGroup rbg;
@@ -22,10 +24,13 @@ public class RotateDialog extends JDialog{
 	public RotateDialog(MainInterface w,boolean modal) {
 		super(w.W,modal);
 		setTitle("Rotar la figura");
-		setSize(600,120);
+		setSize(600,180);
 		setLayout(new FlowLayout());
 		setLocationRelativeTo(w.W);
 		this.setBackground(w.uno);
+		
+		Image icon = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("Resources/icon.png"));
+		setIconImage(icon);
 		
 		lbl1 = new JLabel("Cantidad a rotar");
 		lbl1.setForeground(w.dos);
@@ -46,8 +51,12 @@ public class RotateDialog extends JDialog{
 		btnAllow.setForeground(w.uno);
 		btnCancel = new JButton("Cancelar");
 		btnCancel.setBackground(w.tres);
+		
+		ruta = getClass().getResource("/Resources/rotateg.gif");
+		lblimg = new JLabel(new ImageIcon(ruta));
+		
 		btnCancel.setForeground(w.uno);
-		add(lbl1); add(tf1); add(lbl2); add(rb1); add(lbl3); add(rb2); add(btnAllow); add(btnCancel);
+		add(lbl1); add(tf1); add(lbl2); add(rb1); add(lbl3); add(rb2); add(lblimg); add(btnAllow); add(btnCancel);
 		
 		btnAllow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {					

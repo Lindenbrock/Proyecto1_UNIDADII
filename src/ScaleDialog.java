@@ -1,4 +1,6 @@
 import java.awt.FlowLayout;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
@@ -11,17 +13,20 @@ import javax.swing.JTextField;
 
 public class ScaleDialog extends JDialog{
 	double cantSca;
-	JLabel lbl1,lbl2;
+	JLabel lbl1,lbl2,lblimg;
 	JTextField tf1;
 	JButton btnAllow,btnCancel;
 	
 	public ScaleDialog(MainInterface w,boolean modal) {
 		super(w.W,modal);
 		setTitle("Escalar la figura");
-		setSize(500,80);
+		setSize(350,200);
 		setLayout(new FlowLayout());
 		setLocationRelativeTo(w.W);
 		this.setBackground(w.uno);
+		
+		Image icon = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("Resources/icon.png"));
+		setIconImage(icon);
 		
 		URL ruta = getClass().getResource("/Resources/scale.png");
 		lbl1 = new JLabel(new ImageIcon(ruta));
@@ -34,7 +39,11 @@ public class ScaleDialog extends JDialog{
 		btnCancel = new JButton("Cancelar");
 		btnCancel.setBackground(w.tres);
 		btnCancel.setForeground(w.uno);
-		add(lbl1); add(lbl2); add(tf1); add(btnAllow); add(btnCancel);
+		
+		ruta = getClass().getResource("/Resources/scaleg.gif");
+		lblimg = new JLabel(new ImageIcon(ruta));
+		
+		add(lbl1); add(lbl2); add(tf1); add(lblimg); add(btnAllow); add(btnCancel);
 		
 		btnAllow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
